@@ -9,12 +9,16 @@
  * Fixed rate clock implementation
  */
 
+#include <linux/bitops.h>
 #include <linux/clk-provider.h>
+#include <linux/mfd/syscon.h>
 #include <linux/module.h>
 #include <linux/slab.h>
+#include <linux/regmap.h>
 #include <linux/io.h>
 #include <linux/err.h>
 #include <linux/of.h>
+#include <linux/of_address.h>
 
 /*
  * DOC: basic fixed-rate clock that cannot gate
@@ -134,4 +138,90 @@ void of_fixed_clk_setup(struct device_node *node)
 }
 EXPORT_SYMBOL_GPL(of_fixed_clk_setup);
 CLK_OF_DECLARE(fixed_clk, "fixed-clock", of_fixed_clk_setup);
+
+/**
+ * of_specified_clk_read() - Read the register specifying the clock rate.
+ * @node:	Device tree node.
+ * @reg_val:	Output pointer to write register value.
+ *
+ * Returns:	0 on success, -errno on failure.
+ */
+static int of_specified_clk_read(struct device_node *node, u32 *reg_val)
+{
+	void __iomem *reg;
+	struct regmap *syscon;
+	int ret;
+	u32 offset;
+
+	/* First try iomapping and reading the configuration register */
+	reg = of_iomap(node, 0);
+	if (reg) {
+		*reg_val = readl(reg);
+		iounmap(reg);
+		return 0;
+	}
+
+	/* Next look for a syscon phandle */
+	syscon = syscon_regmap_lookup_by_phandle(node, "syscon-reg");
+	if (IS_ERR(syscon))
+		return PTR_ERR(syscon);
+
+	/* Get the register offset from the second element */
+	ret = of_property_read_u32_index(node, "syscon-reg", 1, &offset);
+	if (ret)
+		return ret;
+
+	/* Read the register value */
+	return regmap_read(syscon, offset, reg_val);
+}
+
+/**
+ * of_specified_clk_setup() - Setup function for discoverable fixed rate clock.
+ * @node:	Device tree node.
+ */
+void of_specified_clk_setup(struct device_node *node)
+{
+	struct clk *clk;
+	const char *clk_name = node->name;
+	u32 shift, mask, rate, reg_val, val;
+	u32 accuracy = 0;
+	struct property *prop;
+	const __be32 *p;
+
+	/* Read the register value specifying the clock rate */
+	if (of_specified_clk_read(node, &reg_val))
+		return;
+
+	/* Apply bit-mask */
+	if (of_property_read_u32(node, "bit-mask", &mask))
+		return;
+	reg_val &= mask;
+	/* Apply bit-shift */
+	if (of_property_read_u32(node, "bit-shift", &shift))
+		shift = ffs(mask) - 1;
+	reg_val >>= shift;
+
+	/* Look through the mapping for a matching frequency */
+	of_property_for_each_u32(node, "table", prop, p, val) {
+		p = of_prop_next_u32(prop, p, &rate);
+		if (!p)
+			break;
+		if (val == reg_val)
+			goto found_rate;
+	}
+	/* No match found */
+	return;
+found_rate:
+	of_property_read_u32(node, "clock-accuracy", &accuracy);
+
+	of_property_read_string(node, "clock-output-names", &clk_name);
+
+	clk = clk_register_fixed_rate_with_accuracy(NULL, clk_name, NULL,
+						    CLK_IS_ROOT, rate,
+						    accuracy);
+	if (!IS_ERR(clk))
+		of_clk_add_provider(node, of_clk_src_simple_get, clk);
+}
+EXPORT_SYMBOL_GPL(of_specified_clk_setup);
+CLK_OF_DECLARE(specified_clk, "specified-clock", of_specified_clk_setup);
 #endif

@@ -247,4 +247,26 @@ void tz1090_clk_register_dividers(struct tz1090_clk_provider *p,
 				  const struct tz1090_clk_divider *dividers,
 				  unsigned int count);
 
+
+/* PLLs */
+
+struct tz1090_clk_pll {
+	unsigned int		id;
+	unsigned long		reg_base;
+	const char		*name;
+	const char		*parent;
+};
+
+#define PLL(_id, _parent, _name, _reg)			\
+	{						\
+		.id		= (_id),		\
+		.reg_base	= (_reg),		\
+		.name		= (_name),		\
+		.parent		= (_parent),		\
+	}
+
+void tz1090_clk_register_plls(struct tz1090_clk_provider *p,
+			      const struct tz1090_clk_pll *plls,
+			      unsigned int count);
+
 #endif

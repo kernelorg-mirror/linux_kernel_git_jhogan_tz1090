@@ -2536,16 +2536,18 @@ serial8250_do_set_termios(struct uart_port *port, struct ktermios *termios,
 	struct uart_8250_port *up = up_to_u8250p(port);
 	unsigned char cval;
 	unsigned long flags;
-	unsigned int baud, quot, frac = 0;
+	unsigned int baud, quot, frac = 0, uartclk_hi;
 
 	cval = serial8250_compute_lcr(up, termios->c_cflag);
 
 	/*
-	 * Ask the core to calculate the divisor for us.
+	 * Ask the core to calculate the divisor for us, but tolerate some
+	 * variance (e.g. if the uartclk is only slightly under 1.8432MHz).
 	 */
+	uartclk_hi = port->uartclk + port->uartclk / 128;
 	baud = uart_get_baud_rate(port, termios, old,
 				  port->uartclk / 16 / 0xffff,
-				  port->uartclk / 16);
+				  uartclk_hi / 16);
 	quot = serial8250_get_divisor(up, baud, &frac);
 
 	/*
@@ -3269,15 +3271,16 @@ serial8250_console_write(struct console *co, const char *s, unsigned int count)
 	/* check scratch reg to see if port powered off during system sleep */
 	if (up->canary && (up->canary != serial_port_in(port, UART_SCR))) {
 		struct ktermios termios;
-		unsigned int baud, quot, frac = 0;
+		unsigned int baud, quot, frac = 0, uartclk_hi;
 
 		termios.c_cflag = port->cons->cflag;
 		if (port->state->port.tty && termios.c_cflag == 0)
 			termios.c_cflag = port->state->port.tty->termios.c_cflag;
 
+		uartclk_hi = port->uartclk + port->uartclk / 128;
 		baud = uart_get_baud_rate(port, &termios, NULL,
 					  port->uartclk / 16 / 0xffff,
-					  port->uartclk / 16);
+					  uartclk_hi / 16);
 		quot = serial8250_get_divisor(up, baud, &frac);
 
 		serial8250_set_divisor(port, baud, quot, frac);

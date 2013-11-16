@@ -153,4 +153,35 @@ struct tz1090_clk_mux_bank {
 void tz1090_clk_register_mux_bank(struct tz1090_clk_provider *p,
 				  const struct tz1090_clk_mux_bank *bank);
 
+
+/* Deleters */
+
+/**
+ * struct tz1090_clk_deleter - Describes a clock deleter.
+ * @id:		Id of output clock in provider.
+ * @reg:	Offset of deleter register in the MMIO region.
+ * @name:	Name of deleted clock to provide.
+ * @parent:	Name of parent/source clocks.
+ *
+ * The deleter is assumed to have a period of 1024.
+ */
+struct tz1090_clk_deleter {
+	unsigned int		id;
+	unsigned long		reg;
+	const char		*name;
+	const char		*parent;
+};
+
+#define DEL(_id, _parent, _name, _reg)		\
+	{					\
+		.id		= (_id),	\
+		.reg		= (_reg),	\
+		.name		= (_name),	\
+		.parent		= (_parent),	\
+	}
+
+void tz1090_clk_register_deleters(struct tz1090_clk_provider *p,
+				  const struct tz1090_clk_deleter *deleters,
+				  unsigned int count);
+
 #endif

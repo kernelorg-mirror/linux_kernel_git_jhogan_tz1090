@@ -52,6 +52,28 @@
 			#gpio-range-cells = <3>;
 			compatible = "img,tz1090-pinctrl";
 			reg = <0x02005800 0xe4>;
+
+			/* common pin configurations */
+			pinctrl_uart0: uart0 {
+				uart0_cfg {
+					tz1090,pins =	"uart0_rxd",
+							"uart0_txd";
+					tz1090,function = "perip";
+				};
+			};
+			pinctrl_uart0_flow: uart0_flow {
+				uart0_cfg {
+					tz1090,pins =	"uart0_cts",
+							"uart0_rts";
+					tz1090,function = "perip";
+				};
+			};
+			pinctrl_uart1: uart1 {
+				uart1_cfg {
+					tz1090,pins =	"uart1";
+					tz1090,function = "perip";
+				};
+			};
 		};
 
 		pdc_pinctrl: pinctrl@02006500 {
@@ -108,5 +130,38 @@
 					<10 IRQ_TYPE_NONE>;
 			gpio-ranges = <&pdc_pinctrl 0 0 7>;
 		};
+
+		uart0: uart@02004b00 {
+			compatible = "snps,dw-apb-uart";
+			pinctrl-names = "default";
+			pinctrl-0 = <	&pinctrl_uart0>;
+			reg = <0x02004b00 0x100>;
+			interrupts = <4 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&top_cr CLK_TOP_UART>,
+				 <&perip_cr CLK_PERIP_UART0>;
+			clock-names = "baudclk", "apb_pclk";
+			assigned-clocks = <&top_cr CLK_TOP_UART>;
+			assigned-clock-rates = <1843200>;
+			reg-shift = <2>;
+			reg-io-width = <4>;
+			status = "disabled";
+		};
+
+		uart1: uart@02004c00 {
+			compatible = "snps,dw-apb-uart";
+			pinctrl-names = "default";
+			pinctrl-0 = <	&pinctrl_uart1>;
+			reg = <0x02004c00 0x100>;
+			interrupts = <5 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&top_cr CLK_TOP_UART>,
+				 <&perip_cr CLK_PERIP_UART1>;
+			clock-names = "baudclk", "apb_pclk";
+			assigned-clocks = <&top_cr CLK_TOP_UART>;
+			assigned-clock-rates = <1843200>;
+			reg-shift = <2>;
+			reg-io-width = <4>;
+			status = "disabled";
+		};
+
 	};
 };

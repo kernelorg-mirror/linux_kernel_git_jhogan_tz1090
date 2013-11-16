@@ -17,6 +17,10 @@
 	clock-frequency = <32768>;
 };
 
+&uart0 {
+	status = "okay";
+};
+
 / {
 	model = "ImgTec 01TT Minimorph";
 	compatible =	"img,tz1090-01tt", "img,tz1090-01sp",

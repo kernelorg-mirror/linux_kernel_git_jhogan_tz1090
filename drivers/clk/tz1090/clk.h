@@ -34,4 +34,53 @@ const char *tz1090_clk_xlate(struct tz1090_clk_provider *p,
 			     const char *clk_name);
 void tz1090_clk_register_provider(struct tz1090_clk_provider *p);
 
+
+/* Clock gate banks */
+
+/**
+ * struct tz1090_clk_gate - Describes an individual gate in a bank.
+ * @shift:	Shift of bit controlling gate within the bank control register.
+ * @name:	Name of gated clock to provide.
+ * @parent:	Name of parent/source clock.
+ */
+struct tz1090_clk_gate {
+	unsigned int	shift;
+	const char	*name;
+	const char	*parent;
+};
+
+/**
+ * struct tz1090_clk_gate_bank - Describes a gate bank.
+ * @id_base:	Base id of bank in provider.
+ *		Individual gates get the id id_base + index in gates array.
+ * @reg_base:	Offset of gate bank register in the MMIO region.
+ * @gates:	Pointer to array of gates in the bank, terminated by one with a
+ *		NULL name field.
+ */
+struct tz1090_clk_gate_bank {
+	unsigned int			id_base;
+	unsigned long			reg_base;
+	const struct tz1090_clk_gate	*gates;
+};
+
+#define GATE(_shift, _parent, _name)					\
+	{								\
+		.shift		= (_shift),				\
+		.name		= (_name),				\
+		.parent		= (_parent),				\
+	},
+
+#define GATE_BANK(_name, _id, _reg, _gates)				\
+	static const struct tz1090_clk_gate_bank _name __initconst = {	\
+		.id_base	= (_id),				\
+		.reg_base	= (_reg),				\
+		.gates		= (const struct tz1090_clk_gate[]) {	\
+			_gates						\
+			{ .name	= NULL }				\
+		},							\
+	}
+
+void tz1090_clk_register_gate_bank(struct tz1090_clk_provider *p,
+				   const struct tz1090_clk_gate_bank *bank);
+
 #endif

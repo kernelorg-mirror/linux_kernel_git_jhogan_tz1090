@@ -1,0 +1,143 @@
+/*
+ * Copyright (C) 2013 Imagination Technologies Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include <dt-bindings/clock/tz1090-top.h>
+#include <dt-bindings/clock/tz1090-hep.h>
+#include <dt-bindings/clock/tz1090-perip.h>
+#include <dt-bindings/clock/tz1090-pdc.h>
+
+/ {
+	soc {
+		/*
+		 * ============ EXTERNAL CLOCKS/OSCILLATORS ============
+		 */
+
+		/* XTAL1 frequency is specified in reset bootstrap config */
+		xtal1: xtal1 {
+			compatible = "specified-clock";
+			#clock-cells = <0>;
+			syscon-reg = <&perip_cr 0x4>;	/* CR_PERIP_RESET_CFG */
+			bit-mask = <0x00000f00>;	/* FXTAL */
+			/*	 FXTAL	Frequency */
+			table = <0	16384000>,
+				<1	19200000>,
+				<2	24000000>,
+				<3	24576000>,
+				<4	26000000>,
+				<5	36000000>,
+				<6	36864000>,
+				<7	38400000>,
+				<8	40000000>,
+				<9	48000000>;
+			clock-output-names = "xtal1";
+		};
+
+		/* XTAL2 oscillator (board specific, but 12MHz recommended) */
+		xtal2: xtal2 {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <0>;
+			clock-output-names = "xtal2";
+		};
+
+		/* XTAL3 oscillator (32.768KHz if fitted, assume not fitted) */
+		xtal3: xtal3 {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <0>;
+			clock-output-names = "xtal3";
+		};
+
+		ext_adc_dac: ext_adc_dac {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <0>;
+			clock-output-names = "ext_adc_dac";
+		};
+
+
+		/*
+		 * ============ POWERDOWN CONTROLLER CLOCKS ============
+		 */
+
+		pdc_cr: pdc_cr {
+			compatible = "img,tz1090-pdc-cr", "syscon";
+			#clock-cells = <1>;
+			reg = <0x02006500 0x4>;	/* SOC_GPIO_CONTROL0 */
+			clocks = <&xtal1>,
+				 <&xtal3>;
+			clock-names = "xtal1",
+				      "xtal3";
+		};
+
+
+		/*
+		 * ============ AFE CLOCKS ============
+		 */
+
+		afe_clks: afe_clks {
+			/* This is just a placeholder at the moment */
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <0>;
+		};
+
+
+		/*
+		 * ============ TOP LEVEL CLOCKS ============
+		 */
+
+		top_cr: top_cr {
+			compatible = "img,tz1090-top-cr", "syscon";
+			#clock-cells = <1>;
+			reg = <0x02005900 0xb0>;
+			clocks = <&xtal1>, <&xtal2>, <&ext_adc_dac>,
+				 <&hep_cr CLK_HEP_DDR_EN>,
+				 <&afe_clks>, <&afe_clks>,
+				 <&afe_clks>, <&afe_clks>, <&afe_clks>;
+			clock-names = "xtal1", "xtal2", "ext_adc_dac",
+				      "ddr_en",
+				      "afe_progdiv1", "afe_progdiv3",
+				      "afe_rxsync", "afe_txsync", "iqadc_sync";
+			clock-indices = <CLK_TOP_SYS>,
+					<CLK_TOP_SYS_X2_UNDELETED>;
+			clock-output-names = "sys",
+					     "sys_x2_undeleted";
+		};
+
+
+		/*
+		 * ============ HIGH LEVEL PERIPHERAL CLOCKS ============
+		 */
+
+		hep_cr: hep_cr {
+			compatible = "img,tz1090-hep-cr", "syscon";
+			#clock-cells = <1>;
+			reg = <0x02008c00 0x08>;
+			clocks = <&top_cr CLK_TOP_SYS>,
+				 <&top_cr CLK_TOP_SYS_X2_UNDELETED>;
+			clock-names = "sys",
+				      "sys_x2_undeleted";
+			clock-indices = <CLK_HEP_DDR_EN>;
+			clock-output-names = "ddr_en";
+		};
+
+		/*
+		 * ============ PERIPHERAL CLOCKS ============
+		 */
+
+		perip_cr: perip_cr {
+			compatible = "img,tz1090-perip-cr", "syscon";
+			#clock-cells = <1>;
+			reg = <0x02004000 0x18>;
+			clocks = <&top_cr CLK_TOP_SYS>;
+			clock-names = "sys";
+		};
+
+	};
+};

@@ -9,6 +9,7 @@
 #include "skeleton.dtsi"
 
 #include <dt-bindings/interrupt-controller/irq.h>
+#include "tz1090_clk.dtsi"
 
 / {
 	compatible = "toumaz,tz1090", "img,meta";

@@ -83,4 +83,74 @@ struct tz1090_clk_gate_bank {
 void tz1090_clk_register_gate_bank(struct tz1090_clk_provider *p,
 				   const struct tz1090_clk_gate_bank *bank);
 
+
+/* Clock mux banks */
+
+/**
+ * struct tz1090_clk_mux - Describes an individual mux in a bank.
+ * @shift:	Shift of bit controlling mux within the bank control register.
+ * @name:	Name of muxed clock to provide.
+ * @parents:	Name of two parent/source clocks for when the bit is 0 and 1.
+ * @default_parent:	Default parent to set the mux to.
+ * @mux_flags:	Mux flags.
+ */
+struct tz1090_clk_mux {
+	unsigned int	shift;
+	const char	*name;
+	const char	*parents[2];
+	s8		default_parent;
+	u8		mux_flags;
+};
+
+/**
+ * struct tz1090_clk_mux_bank - Describes a mux bank.
+ * @id_base:	Base id of bank in provider.
+ *		Individual muxes get the id id_base + index in muxes array.
+ * @reg_base:	Offset of mux bank register in the MMIO region.
+ * @muxes:	Pointer to array of muxes in the bank, terminated by one with a
+ *		NULL name field.
+ */
+struct tz1090_clk_mux_bank {
+	unsigned int			id_base;
+	unsigned long			reg_base;
+	const struct tz1090_clk_mux	*muxes;
+};
+
+#define MUX(_shift, _parent0, _parent1, _name)				\
+	{								\
+		.shift		= (_shift),				\
+		.name		= (_name),				\
+		.parents	= {					\
+			_parent0,					\
+			_parent1					\
+		},							\
+		.default_parent	= -1,					\
+		.mux_flags	= 0,					\
+	},
+
+#define MUX_FIXED(_shift, _parent0, _parent1, _name, _default)		\
+	{								\
+		.shift		= (_shift),				\
+		.name		= (_name),				\
+		.parents	= {					\
+			_parent0,					\
+			_parent1					\
+		},							\
+		.default_parent	= (_default),				\
+		.mux_flags	= CLK_MUX_READ_ONLY,			\
+	},
+
+#define MUX_BANK(_name, _id, _reg, _muxes)				\
+	static const struct tz1090_clk_mux_bank _name __initconst = {	\
+		.id_base	= (_id),				\
+		.reg_base	= (_reg),				\
+		.muxes		= (const struct tz1090_clk_mux[]) {	\
+			_muxes						\
+			{ .name	= NULL }				\
+		},							\
+	}
+
+void tz1090_clk_register_mux_bank(struct tz1090_clk_provider *p,
+				  const struct tz1090_clk_mux_bank *bank);
+
 #endif

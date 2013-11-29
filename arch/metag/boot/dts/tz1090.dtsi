@@ -19,6 +19,12 @@
 	clocks = <&top_cr CLK_TOP_META>;
 	clock-names = "core";
 
+	aliases {
+		i2c0 = &i2c0;
+		i2c1 = &i2c1;
+		i2c2 = &i2c2;
+	};
+
 	intc: interrupt-controller {
 		compatible = "img,meta-intc";
 		interrupt-controller;
@@ -54,6 +60,24 @@
 			reg = <0x02005800 0xe4>;
 
 			/* common pin configurations */
+			pinctrl_scb0: scb0 {
+				scb0_cfg {
+					tz1090,pins =	"scb0";
+					tz1090,function = "perip";
+				};
+			};
+			pinctrl_scb1: scb1 {
+				scb1_cfg {
+					tz1090,pins =	"scb1";
+					tz1090,function = "perip";
+				};
+			};
+			pinctrl_scb2: scb2 {
+				scb2_cfg {
+					tz1090,pins =	"scb2";
+					tz1090,function = "perip";
+				};
+			};
 			pinctrl_uart0: uart0 {
 				uart0_cfg {
 					tz1090,pins =	"uart0_rxd",
@@ -129,6 +153,42 @@
 					<9  IRQ_TYPE_NONE>,
 					<10 IRQ_TYPE_NONE>;
 			gpio-ranges = <&pdc_pinctrl 0 0 7>;
+		};
+
+		i2c0: i2c@02004400 {
+			compatible = "img,scb-i2c";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_scb0>;
+			reg = <0x02004400 0x200>;
+			interrupts = <0 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&top_cr CLK_TOP_SCB>,
+				 <&perip_cr CLK_PERIP_SCB0>;
+			clock-names = "scb", "sys";
+			status = "disabled";
+		};
+
+		i2c1: i2c@02004600 {
+			compatible = "img,scb-i2c";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_scb1>;
+			reg = <0x02004600 0x200>;
+			interrupts = <1 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&top_cr CLK_TOP_SCB>,
+				 <&perip_cr CLK_PERIP_SCB1>;
+			clock-names = "scb", "sys";
+			status = "disabled";
+		};
+
+		i2c2: i2c@02004800 {
+			compatible = "img,scb-i2c";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_scb2>;
+			reg = <0x02004800 0x200>;
+			interrupts = <2 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&top_cr CLK_TOP_SCB>,
+				 <&perip_cr CLK_PERIP_SCB2>;
+			clock-names = "scb", "sys";
+			status = "disabled";
 		};
 
 		uart0: uart@02004b00 {

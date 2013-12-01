@@ -221,7 +221,7 @@ menu "Boot options"
 
 choice METAG_BUILTIN_DTB
 	prompt "Embed DTB in kernel image"
-	default METAG_BUILTIN_DTB_TZ1090_GENERIC if SOC_TZ1090
+	default METAG_BUILTIN_DTB_TZ1090_MINIMORPH if SOC_TZ1090
 	default METAG_BUILTIN_DTB_SKELETON
 	help
 	  Embeds a device tree binary in the kernel image.
@@ -236,6 +236,10 @@ config METAG_BUILTIN_DTB_TZ1090_GENERIC
 	bool "TZ1090 Generic"
 	depends on SOC_TZ1090
 
+config METAG_BUILTIN_DTB_TZ1090_MINIMORPH
+	bool "TZ1090 01TT - Minimorph Dev Board"
+	depends on SOC_TZ1090
+
 config METAG_BUILTIN_DTB_CUSTOM
 	bool "Custom"
 
@@ -248,6 +252,7 @@ config METAG_BUILTIN_DTB_NAME
 	string "Custom built in DTB" if METAG_BUILTIN_DTB_CUSTOM
 	depends on METAG_BUILTIN_DTB
 	default "tz1090_generic" if METAG_BUILTIN_DTB_TZ1090_GENERIC
+	default "tz1090_01tt"    if METAG_BUILTIN_DTB_TZ1090_MINIMORPH
 	default "tz1090_generic" if SOC_TZ1090
 	default "skeleton"
 	help

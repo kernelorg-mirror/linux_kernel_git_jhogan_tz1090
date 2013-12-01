@@ -1,5 +1,6 @@
 dtb-y	+= skeleton.dtb
 dtb-y	+= tz1090_generic.dtb
+dtb-y	+= tz1090_01tt.dtb
 
 # Built-in dtb
 builtindtb-y	:= $(patsubst "%",%,$(CONFIG_METAG_BUILTIN_DTB_NAME))

@@ -1,0 +1,24 @@
+/*
+ * Copyright (C) 2013 Imagination Technologies Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+/dts-v1/;
+
+#include "tz1090.dtsi"
+
+&xtal2 {
+	clock-frequency = <12000000>;
+};
+
+&xtal3 {
+	clock-frequency = <32768>;
+};
+
+/ {
+	model = "ImgTec 01TT Minimorph";
+	compatible =	"img,tz1090-01tt", "img,tz1090-01sp",
+			"toumaz,tz1090", "img,meta";
+};

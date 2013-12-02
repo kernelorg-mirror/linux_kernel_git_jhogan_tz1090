@@ -17,6 +17,10 @@
 	clock-frequency = <32768>;
 };
 
+&ir {
+	status = "okay";
+};
+
 &i2c2 {
 	clock-frequency = <100000>;	/* limit for HDMI */
 	status = "okay";

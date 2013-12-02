@@ -155,6 +155,18 @@
 			gpio-ranges = <&pdc_pinctrl 0 0 7>;
 		};
 
+		ir: ir@02006200 {
+			compatible = "img,ir-rev1";
+			reg = <0x02006200 0x100>;
+			interrupt-parent = <&pdc>;
+			interrupts = <1 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&pdc_cr CLK_PDC_32KHZ>,
+				 <&pdc_cr CLK_PDC_32KHZ>,
+				 <&top_cr CLK_TOP_PDC>;
+			clock-names = "core", "mod", "sys";
+			status = "disabled";
+		};
+
 		i2c0: i2c@02004400 {
 			compatible = "img,scb-i2c";
 			pinctrl-names = "default";

@@ -155,6 +155,16 @@
 			gpio-ranges = <&pdc_pinctrl 0 0 7>;
 		};
 
+		wdt: wdt@02006000 {
+			compatible = "img,pdc-wdt";
+			reg = <0x02006000 0x20>;
+			interrupt-parent = <&pdc>;
+			interrupts = <2 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&pdc_cr CLK_PDC_32KHZ>,
+				 <&top_cr CLK_TOP_PDC>;
+			clock-names = "wdt", "sys";
+		};
+
 		ir: ir@02006200 {
 			compatible = "img,ir-rev1";
 			reg = <0x02006200 0x100>;

@@ -34,4 +34,21 @@
 	model = "ImgTec 01TT Minimorph";
 	compatible =	"img,tz1090-01tt", "img,tz1090-01sp",
 			"toumaz,tz1090", "img,meta";
+
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <>;
+		softled1 {
+			label = "softled1";
+			gpios = <&gpios0 23 0>;		/* uart0_rts */
+			linux,default-trigger = "rc-feedback";
+		};
+		softled2 {
+			label = "softled2";
+			gpios = <&gpios0 11 0>;		/* spi0_cs2 */
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
 };

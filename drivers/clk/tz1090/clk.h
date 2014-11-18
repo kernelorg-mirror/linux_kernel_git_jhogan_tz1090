@@ -184,4 +184,67 @@ void tz1090_clk_register_deleters(struct tz1090_clk_provider *p,
 				  const struct tz1090_clk_deleter *deleters,
 				  unsigned int count);
 
+
+/* Dividers */
+
+/**
+ * struct tz1090_clk_divider - Describes a clock divider.
+ * @id:		Id of output clock in provider.
+ * @reg:	Offset of divider register in the MMIO region.
+ * @flags:	Clock flags.
+ * @div_flags:	Divider flags.
+ * @shift:	Shift of field controlling divider.
+ * @width:	Width of field controlling divider.
+ * @shared:	1 if register is shared with other important fields and requires
+ *		global locking.
+ * @name:	Name of divided clock to provide.
+ * @parent:	Name of parent/source clocks.
+ */
+struct tz1090_clk_divider {
+	unsigned int		id;
+	unsigned long		reg;
+	unsigned long		flags;
+	u8			div_flags;
+	u8			shift;
+	u8			width;
+	u8			shared;
+	const char		*name;
+	const char		*parent;
+};
+
+#define DIV(_id, _parent, _name, _reg, _width)	\
+	{								\
+		.id		= (_id),				\
+		.reg		= (_reg),				\
+		.width		= (_width),				\
+		.name		= (_name),				\
+		.parent		= (_parent),				\
+	}
+
+#define DIV_FLAGS(_id, _parent, _name, _reg, _width, _flags, _divflags)	\
+	{								\
+		.id		= (_id),				\
+		.reg		= (_reg),				\
+		.flags		= (_flags),				\
+		.div_flags	= (_divflags),				\
+		.width		= (_width),				\
+		.name		= (_name),				\
+		.parent		= (_parent),				\
+	}
+
+#define DIV_SHARED(_id, _parent, _name, _reg, _width, _shift)		\
+	{								\
+		.id		= (_id),				\
+		.reg		= (_reg),				\
+		.shift		= (_shift),				\
+		.width		= (_width),				\
+		.shared		= 1,					\
+		.name		= (_name),				\
+		.parent		= (_parent),				\
+	}
+
+void tz1090_clk_register_dividers(struct tz1090_clk_provider *p,
+				  const struct tz1090_clk_divider *dividers,
+				  unsigned int count);
+
 #endif

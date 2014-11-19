@@ -6379,6 +6379,13 @@ F:	drivers/irqchip/irq-metag.c
 F:	drivers/irqchip/irq-metag-ext.c
 F:	drivers/tty/metag_da.c
 
+METAG/TZ1090 SOC SUPPORT
+M:	James Hogan <james.hogan@imgtec.com>
+L:	linux-metag@vger.kernel.org
+S:	Maintained
+F:	drivers/irqchip/irq-imgpdc.c
+N:	tz1090
+
 MICROBLAZE ARCHITECTURE
 M:	Michal Simek <monstr@monstr.eu>
 W:	http://www.monstr.eu/fdt/

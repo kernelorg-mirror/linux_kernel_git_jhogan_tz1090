@@ -9,4 +9,5 @@ obj-y		+= clk-tz1090-pll.o
 
 obj-y		+= clk-tz1090-hep.o
 obj-y		+= clk-tz1090-pdc.o
+obj-y		+= clk-tz1090-perip.o
 obj-y		+= clk-tz1090-top.o

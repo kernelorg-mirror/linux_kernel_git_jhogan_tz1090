@@ -1,0 +1,68 @@
+Binding for TZ1090 Top level register clocks.
+
+This binding uses the common clock binding[1]. It represents the clocks
+controlled from the top level registers of the TZ1090, and encompasses most of
+the complexity of the TZ1090 clock tree:
+
+[1] Documentation/devicetree/bindings/clock/clock-bindings.txt
+
+Required properties:
+- compatible         : Shall be "img,tz1090-top-cr", "syscon".
+- #clock-cells       : From common clock binding; shall be set to 1.
+- reg                : Base address for clock registers in top level register
+                       region.
+- clocks             : Clock specifiers for each input clock.
+- clock-names        : Labels for each input clock specified in clocks.
+                       Can contain the following entries:
+                       "xtal1"        : XTAL1 oscillator.
+                       "xtal3"        : XTAL2 oscillator.
+                       "ext_adc_dac"  : External ADC/DAC clock input.
+                       "ddr_en"       : Output of HEP DDR clock gate.
+                       "afe_progdiv1",
+                       "afe_progdiv3",
+                       "afe_rxsync",
+                       "afe_txsync",
+                       "iqadc_sync"   : Output clocks from AFE block.
+
+Optional properties:
+- clock-indices      : From common clock binding. Allows clock-output-names to
+                       be sparse.
+- clock-output-names : From common clock binding. May be used to name specific
+                       output clocks so that other clock providers can find
+                       the clocks by name before the provider has been
+                       instantiated. Can contain:
+                       "sys", "sys_x2_undeleted" "scb", "ext_stc0", "ext_stc1",
+                       "if1", "if0", "sys_ucc1", "sys_mtx", "meta", "ucc0",
+                       "ucc1_del", "sys_undeleted", "afe", "adcpll_div", "uart",
+                       "pdm", "spi0", "spi1", "i2sm", "usb_phy", "sdhost",
+                       "ring_osc", "i2s", "meta_trace", "pixel", "out0", "out1",
+                       "ddr", "sys_pll", "sys_pdc"
+
+Clock Specifier Definition:
+- <1st-cell>: Output clock number. Use constants from
+              <dt-bindings/clock/tz1090-top.h>.
+
+Examples:
+	top_cr: top_cr {
+		compatible = "img,tz1090-top-cr", "syscon";
+		#clock-cells = <1>;
+		reg = <0x02005900 0xb0>;
+		/* input clocks */
+		clocks = <&xtal1>, <&xtal2>, <&ext_adc_dac>,
+			 <&hep_cr CLK_HEP_DDR_EN>;
+		clock-names = "xtal1", "xtal2", "ext_adc_dac",
+			      "ddr_en";
+		/* output clocks for other clock providers */
+		clock-indices = <CLK_TOP_SYS>,
+				<CLK_TOP_SYS_X2_UNDELETED>;
+		clock-output-names = "sys",
+				     "sys_x2_undeleted";
+	};
+
+	ir {
+		...
+		clocks = <&pdc_cr CLK_PDC_32KHZ>,
+			 <&top_cr CLK_TOP_PDC>;
+		clock-names = "core", "sys";
+		...
+	};

@@ -16,6 +16,9 @@
 
 	interrupt-parent = <&intc>;
 
+	clocks = <&top_cr CLK_TOP_META>;
+	clock-names = "core";
+
 	intc: interrupt-controller {
 		compatible = "img,meta-intc";
 		interrupt-controller;

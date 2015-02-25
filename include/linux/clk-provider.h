@@ -265,6 +265,7 @@ struct clk *clk_register_fixed_rate_with_accuracy(struct device *dev,
 		unsigned long fixed_rate, unsigned long fixed_accuracy);
 
 void of_fixed_clk_setup(struct device_node *np);
+void of_specified_clk_setup(struct device_node *np);
 
 /**
  * struct clk_gate - gating clock

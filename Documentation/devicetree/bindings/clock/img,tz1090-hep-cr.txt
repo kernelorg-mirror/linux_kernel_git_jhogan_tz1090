@@ -1,0 +1,53 @@
+Binding for TZ1090 High end peripheral clocks.
+
+This binding uses the common clock binding[1]. It represents the clocks
+controlled from the high end peripheral registers of the TZ1090:
+
+[1] Documentation/devicetree/bindings/clock/clock-bindings.txt
+
+Required properties:
+- compatible         : Shall be "img,tz1090-hep-cr", "syscon".
+- #clock-cells       : From common clock binding; shall be set to 1.
+- reg                : Base address for clock registers in high end peripheral
+                       register region.
+- clocks             : Clock specifiers for each input clock.
+- clock-names        : Labels for each input clock specified in clocks.
+                       Can contain the following entries:
+                       "sys"              : Main system clock.
+                       "sys_x2_undeleted" : System clock before division and
+                                            deletion.
+
+Optional properties:
+- clock-indices      : From common clock binding. Allows clock-output-names to
+                       be sparse.
+- clock-output-names : From common clock binding. May be used to name specific
+                       output clocks so that other clock providers can find
+                       the clocks by name before the provider has been
+                       instantiated. Can contain:
+                       "sys_2d", "ddr_en", "sys_pdp"
+
+Clock Specifier Definition:
+- <1st-cell>: Output clock number. Use constants from
+              <dt-bindings/clock/tz1090-hep.h>.
+
+Examples:
+	hep_cr: hep_cr {
+		compatible = "img,tz1090-hep-cr", "syscon";
+		#clock-cells = <1>;
+		reg = <0x02008c00 0x08>;
+		/* input clocks */
+		clocks = <&top_clks CLK_TOP_SYS>,
+			 <&top_clks CLK_TOP_SYS_X2_UNDELETED>;
+		clock-names = "sys",
+			      "sys_x2_undeleted";
+		/* output clocks for other clock providers */
+		clock-indices = <CLK_HEP_DDR_EN>;
+		clock-output-names = "ddr_en";
+	};
+
+	pdp {
+		...
+		clocks = <&hep_cr CLK_HEP_PDP>;
+		clock-names = "pdp";
+		...
+	};

@@ -1,0 +1,59 @@
+Binding for TZ1090 PDC clocks.
+
+This binding uses the common clock binding[1]. It represents the clocks
+required to generate the 32KHz PDC clock used by the devices in the low power
+domain:
+
+          ___________
+xtal1 ___| xtal1_div |____________________________
+         |___________|  |    ________   xtal1_div
+                        `--o| rtc_sw \____________
+xtal3 ----------------------|________/  32khz
+
+xtal1_div = xtal1 / (reg[26:16] + 1)
+xtal3 = reg[30] ? xtal3 : xtal1_div
+
+
+[1] Documentation/devicetree/bindings/clock/clock-bindings.txt
+
+Required properties:
+- compatible         : Shall be "img,tz1090-pdc-cr", "syscon".
+- #clock-cells       : From common clock binding; shall be set to 1.
+- reg                : Base address for registers controlling PDC clocks.
+- clocks             : Clock specifiers for each input clock.
+- clock-names        : Labels for each input clock specified in clocks.
+                       Can contain the following entries:
+                       "xtal1" : XTAL1 oscillator.
+                       "xtal3" : XTAL3 32KHz oscillator.
+
+Optional properties:
+- clock-indices      : From common clock binding. Allows clock-output-names to
+                       be sparse.
+- clock-output-names : From common clock binding. May be used to name specific
+                       output clocks so that other clock providers can find
+                       the clocks by name before the provider has been
+                       instantiated. Can contain:
+                       "32khz"     : 32khz PDC clock.
+
+Clock Specifier Definition:
+- <1st-cell>: Output clock number. Use constants from
+              <dt-bindings/clock/tz1090-pdc.h>.
+
+Examples:
+	pdc_cr: pdc_cr {
+		compatible = "img,tz1090-pdc-cr", "syscon";
+		#clock-cells = <1>;
+		reg = <0x02006500 0x4>;	/* SOC_GPIO_CONTROL0 */
+		clocks = <&xtal1>,
+			 <&xtal3>;
+		clock-names = "xtal1",
+			      "xtal3";
+	};
+
+	ir {
+		...
+		clocks = <&pdc_cr CLK_PDC_32KHZ>,
+			 <&top_cr CLK_TOP_PDC>;
+		clock-names = "core", "sys";
+		...
+	};

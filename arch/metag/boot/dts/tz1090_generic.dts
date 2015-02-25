@@ -8,3 +8,7 @@
 /dts-v1/;
 
 #include "tz1090.dtsi"
+
+&uart0 {
+	status = "okay";
+};

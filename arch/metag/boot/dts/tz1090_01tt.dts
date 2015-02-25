@@ -1,0 +1,54 @@
+/*
+ * Copyright (C) 2013 Imagination Technologies Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+/dts-v1/;
+
+#include "tz1090.dtsi"
+
+&xtal2 {
+	clock-frequency = <12000000>;
+};
+
+&xtal3 {
+	clock-frequency = <32768>;
+};
+
+&ir {
+	status = "okay";
+};
+
+&i2c2 {
+	clock-frequency = <100000>;	/* limit for HDMI */
+	status = "okay";
+};
+
+&uart0 {
+	status = "okay";
+};
+
+/ {
+	model = "ImgTec 01TT Minimorph";
+	compatible =	"img,tz1090-01tt", "img,tz1090-01sp",
+			"toumaz,tz1090", "img,meta";
+
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <>;
+		softled1 {
+			label = "softled1";
+			gpios = <&gpios0 23 0>;		/* uart0_rts */
+			linux,default-trigger = "rc-feedback";
+		};
+		softled2 {
+			label = "softled2";
+			gpios = <&gpios0 11 0>;		/* spi0_cs2 */
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
+};

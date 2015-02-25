@@ -1,0 +1,49 @@
+Binding for TZ1090 Peripheral register clocks.
+
+This binding uses the common clock binding[1]. It represents the clocks
+controlled from the peripheral registers of the TZ1090:
+
+[1] Documentation/devicetree/bindings/clock/clock-bindings.txt
+
+Required properties:
+- compatible         : Shall be "img,tz1090-perip-cr", "syscon".
+- #clock-cells       : From common clock binding; shall be set to 1.
+- reg                : Base address for clock registers in peripheral register
+                       region.
+- clocks             : Clock specifiers for each input clock.
+- clock-names        : Labels for each input clock specified in clocks.
+                       Can contain the following entries:
+                       "sys" : Main system clock.
+
+Optional properties:
+- clock-indices      : From common clock binding. Allows clock-output-names to
+                       be sparse.
+- clock-output-names : From common clock binding. May be used to name specific
+                       output clocks so that other clock providers can find
+                       the clocks by name before the provider has been
+                       instantiated. Can contain:
+                       "sys_scb0", "sys_scb1", "sys_scb2", "sys_sdio",
+                       "sys_uart0", "sys_uart1", "sys_spim", "sys_spis",
+                       "sys_spim1", "sys_i2sout", "sys_i2sin", "sys_lcd",
+                       "sys_sdhost", "sys_usb"
+
+Clock Specifier Definition:
+- <1st-cell>: Output clock number. Use constants from
+              <dt-bindings/clock/tz1090-perip.h>.
+
+Examples:
+	perip_cr: perip_cr {
+		compatible = "img,tz1090-perip-cr", "syscon";
+		#clock-cells = <1>;
+		reg = <0x02004000 0x18>;
+		clocks = <&top_cr CLK_TOP_SYS>;
+		clock-names = "sys";
+	};
+
+	i2c {
+		...
+		clocks = <&top_cr CLK_TOP_SCB>,
+			 <&perip_cr CLK_PERIP_SCB0>;
+		clock-names = "scb", "sys";
+		...
+	};

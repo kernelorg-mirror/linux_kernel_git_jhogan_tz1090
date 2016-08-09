@@ -1,0 +1,28 @@
+Meta/TZ1090 SoC Support Repository
+==================================
+
+Maintainer: James Hogan <james.hogan@imgtec.com>
+
+This repository contains experimental Meta/TZ1090 SoC support intended for
+upstream. It is based on the SoC support in the metag-legacy.git repository, but
+has been split up, cleaned up, and converted to Device Tree as appropriate.
+
+The main branches are as follows:
+
+wip-tz1090:
+	This contains the latest experimental TZ1090 SoC support. It may be
+	rebased, but at this point is unlikely to be progressed further.
+
+	Note, very minimal support for TZ1090 can be found in mainline, enough
+	to boot a kernel to a prompt on a DA channel (over JTAG).
+
+
+Buildroot and QEMU
+------------------
+
+Buildroot and QEMU ports for Meta & TZ1090 can be found on GitHub:
+
+https://github.com/img-meta
+
+Buildroot can build a Meta toolchain, and QEMU can be used to emulate a fair
+portion of the TZ1090 SoC in order to run a Meta Linux kernel for TZ1090.
